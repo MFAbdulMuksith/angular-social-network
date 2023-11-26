@@ -9,11 +9,28 @@ trigger:
 pool:
   name: Mumbai.EC2.t2
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+- stage: Build
+  displayName: 'Build stage CI'
+  jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          name: Mumbai.EC2.t2
+        steps:
+           - task: CmdLine@2
+             displayName: 'Builds'
+              inputs:
+                script: |
+                  pwd
+                  ls -al
+                  sudo docker build -t myangular-app .
+                  sudo docker run -p 8080:80 myangular-app
+                  sudo docker ps
+                  echo Visit `http://localhost:8080`
 
-- script: |
-    pwd
-    ls -al
-  displayName: 'Run a multi-line script'
+
+
+
+
+
