@@ -17,6 +17,20 @@ stages:
       displayName: 'Build Job'
       pool:
         name: Mumbai.EC2.t2
+        - task: CmdLine@2
+          inputs:
+            script: |
+              pwd
+              ls -al
+              sudo docker build -t angular-img .
+              sudo docker stop angular-cont
+              sudo docker images
+              sudo docker rm angular-cont
+              sudo docker run -d -p 80:80 --name angular-cont angular-img
+              sudo docker ps
+              echo "Visit http://52.66.246.156:80/"
+
+
       steps:
         - task: ECRPushImage@1
           displayName: 'ECR push'
