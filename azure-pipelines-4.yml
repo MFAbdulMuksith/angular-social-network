@@ -41,5 +41,3 @@ stages:
             repositoryName: '$(ECR-repo-name)'
             forceDockerNamingConventions: true
 
-- stage: 
-  
