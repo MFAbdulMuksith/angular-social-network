@@ -4,67 +4,55 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
-
+  - master
 pool:
   name: Mumbai.EC2.t2
-
 stages:
-- stage: Build
-  displayName: 'Build stage'
-  jobs:
-    - job: BuildJob
-      displayName: 'Build Job'
-      pool:
-        name: Mumbai.EC2.t2
-        - task: CmdLine@2
-          inputs:
-            script: |
-              pwd
-              ls -al
-              sudo docker build -t angular-img .
-              sudo docker stop angular-cont
-              sudo docker images
-              sudo docker rm angular-cont
-              sudo docker run -d -p 80:80 --name angular-cont angular-img
-              sudo docker ps
-              echo "Visit http://52.66.246.156:80/"
-
-
-      steps:
-        - task: ECRPushImage@1
-          displayName: 'ECR push'
-          inputs:
-            awsCredentials: 'my-AWS-connection'
-            regionName: 'ap-south-1'
-            imageSource: 'imageid'
-            sourceImageId: '$(ECR URI)'
-            repositoryName: '$(ECR-repo-name)'
-            forceDockerNamingConventions: true
-
-- stage: Deploy
-  displayName: 'Deploy stage'
-  jobs:
-    - job: DeployJob
-      displayName: 'Deploy Job'
-      pool:
-        name: Mumbai.EC2.t2
-      steps:
-        - task: ECRPullImage@1
-          inputs:
-            awsCredentials: 'my-AWS-connection'
-            regionName: 'ap-south-1'
-            repository: 'my-anguler-app'
-            imageSource: 'imagetag'
-        - task: CmdLine@2
-          inputs:
-            script: |
-              pwd
-              ls -al
-              sudo docker build -t angular-img .
-              sudo docker stop angular-cont
-              sudo docker images
-              sudo docker rm angular-cont
-              sudo docker run -d -p 80:80 --name angular-cont angular-img
-              sudo docker ps
-              echo "Visit http://52.66.246.156:80/"
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: BuildJob
+        displayName: Build Job
+        pool:
+          name: Mumbai.EC2.t2
+        steps:
+          - task: CmdLine@2
+            inputs:
+              script: |
+                pwd
+                ls -al
+                sudo docker build -t angular-img .
+                sudo docker stop angular-cont
+                sudo docker images
+          - task: ECRPushImage@1
+            displayName: ECR push
+            inputs:
+              awsCredentials: my-AWS-connection
+              regionName: ap-south-1
+              imageSource: imageid
+              sourceImageId: $(ECR URI)
+              repositoryName: $(ECR-repo-name)
+              forceDockerNamingConventions: true
+  - stage: Deploy
+    displayName: Deploy stage
+    jobs:
+      - job: DeployJob
+        displayName: Deploy Job
+        pool:
+          name: Mumbai.EC2.t2
+        steps:
+          - task: ECRPullImage@1
+            inputs:
+              awsCredentials: my-AWS-connection
+              regionName: ap-south-1
+              repository: my-anguler-app
+              imageSource: imagetag
+          - task: CmdLine@2
+            inputs:
+              script: |
+                pwd
+                ls -al
+                sudo docker rm angular-cont
+                sudo docker run -d -p 80:80 --name angular-cont angular-img
+                sudo docker ps
+                echo "Visit http://65.0.178.119/"
