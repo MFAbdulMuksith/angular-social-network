@@ -32,20 +32,6 @@ pool:
                   sudo docker ps
                   echo Visit `http://localhost:8080`
 
-  stages:
-  - stage: Build
-    displayName: 'Build stage'
-    jobs:
-        - job: BuildJob
-          displayName: 'Build Job'
-          pool:
-            name: Mumbai.EC2.t2
-          steps:
-            - task: CmdLine@2
-              displayName: 'builds'
-              inputs:
-                script: |
-
 
 
 
