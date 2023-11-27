@@ -19,7 +19,7 @@ stages:
         name: Mumbai.EC2.t2
       steps:
         - task: CmdLine@2
-          displayName: 'builds'
+          displayName: 'Builds'
           inputs:
             script: |
               pwd
@@ -31,3 +31,15 @@ stages:
               sudo docker run -d -p 80:80 --name angular-cont angular-img
               sudo docker ps
               echo "Visit http://52.66.246.156:80/"
+        - task: ECRPushImage@1
+          displayName: 'ECR push'
+          inputs:
+            awsCredentials: 'my-AWS-connection'
+            regionName: 'ap-south-1'
+            imageSource: 'imageid'
+            sourceImageId: '$(ECR URI)'
+            repositoryName: '$(ECR-repo-name)'
+            forceDockerNamingConventions: true
+
+- stage: 
+  
