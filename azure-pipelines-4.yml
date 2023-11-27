@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  name: Mumbai.EC2.t2
+
+stages:
+- stage: Build
+  displayName: 'Build stage'
+  jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          name: Mumbai.EC2.t2
+        steps:
+           - task: CmdLine@2
+             displayName: 'builds'
+             inputs:
+               script: |
+                 pwd
+                 ls -al
+                 sudo docker build -t angular-img .
+                 sudo docker stop angular-img
+                 sudo docker img
+                 sudo docker rm anguler-cont
+                 sudo docker run -d -p 8080:80 -- name anguler-cont angular-img
+                 sudo docker ps
+                 echo Visit `http://localhost:8080`
+
+stages:
+- stage: Build
+  displayName: 'Build stage'
+  jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          name: Mumbai.EC2.t2
+        steps:
+           - task: CmdLine@2
+             displayName: 'builds'
+             inputs:
+               script: |
+
+
+
+
+
