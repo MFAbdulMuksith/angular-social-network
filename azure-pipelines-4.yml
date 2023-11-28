@@ -24,7 +24,6 @@ stages:
                 pwd
                 ls -al
                 sudo docker build -t angular-img .
-                sudo docker stop angular-cont
                 echo "No container to stop"
                 sudo docker images
           - task: ECRPushImage@1
