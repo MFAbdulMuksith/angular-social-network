@@ -5,14 +5,16 @@
 
 trigger:
   - master
+
 pool:
   name: Mumbai.EC2.t2
+
 stages:
   - stage: Build
-    displayName: Build stage
+    displayName: 'Build stage'
     jobs:
       - job: BuildJob
-        displayName: Build Job
+        displayName: 'Build Job'
         pool:
           name: Mumbai.EC2.t2
         steps:
@@ -23,36 +25,39 @@ stages:
                 ls -al
                 sudo docker build -t angular-img .
                 sudo docker stop angular-cont
+                echo "No container to stop"
                 sudo docker images
           - task: ECRPushImage@1
-            displayName: ECR push
+            displayName: 'ECR push'
             inputs:
-              awsCredentials: my-AWS-connection
-              regionName: ap-south-1
-              imageSource: imageid
-              sourceImageId: $(ECR URI)
-              repositoryName: $(ECR-repo-name)
+              awsCredentials: 'my-AWS-connection'
+              regionName: 'ap-south-1'
+              imageSource: 'imageid'
+              sourceImageId: '$(ECR_URI)'
+              repositoryName: '$(ECR-repo-name)'
               forceDockerNamingConventions: true
+
   - stage: Deploy
-    displayName: Deploy stage
+    displayName: 'Deploy stage'
     jobs:
       - job: DeployJob
-        displayName: Deploy Job
+        displayName: 'Deploy Job'
         pool:
           name: Mumbai.EC2.t2
         steps:
           - task: ECRPullImage@1
             inputs:
-              awsCredentials: my-AWS-connection
-              regionName: ap-south-1
-              repository: my-anguler-app
-              imageSource: imagetag
+              awsCredentials: 'my-AWS-connection'
+              regionName: 'ap-south-1'
+              repository: 'my-angular-app'
+              imageSource: 'imagetag'
           - task: CmdLine@2
             inputs:
               script: |
                 pwd
                 ls -al
                 sudo docker rm angular-cont
+                echo "No container to remove"
                 sudo docker run -d -p 80:80 --name angular-cont angular-img
                 sudo docker ps
                 echo "Visit http://65.0.178.119/"
