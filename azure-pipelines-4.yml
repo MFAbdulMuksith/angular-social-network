@@ -59,4 +59,4 @@ stages:
                 echo "No container to remove"
                 sudo docker run -d -p 80:80 --name angular-cont angular-img
                 sudo docker ps
-                echo "Visit http://65.0.178.119/"
+                echo "Visit http://52.66.240.150/"
