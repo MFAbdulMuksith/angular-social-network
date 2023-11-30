@@ -22,10 +22,3 @@ resources:
  
 variables:
   - group: dev
- 
-stages:
-  - stage: Build
-    displayName: Build
-    jobs: 
-    pool: Mumbai.EC2.t2
-    
