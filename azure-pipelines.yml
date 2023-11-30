@@ -1,38 +1,29 @@
-# Starter pipeline
-# https://www.devguides.dev/how-to-build-and-deploy-docker-images-from-azure-devops-to-aws-ecr/
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
+# This pipeline builds and pushes a Docker image to AWS ECR
+# create a service connection to AWS ECR and name it 'aws-ecr-connection'
+# set the following environment variables:
+# - AWS_ECR_REGISTRY: the name of  AWS ECR registry
+# - AWS_ECR_REPOSITORY: the name of  AWS ECR repository
+# - DOCKERFILE_PATH: the path to  Dockerfile
+# - IMAGE_TAG: the tag for  Docker image
 
 trigger:
 - master
+
 pool:
   name: Mumbai.EC2.t2
 
-stages:
-- stage: Docker
-  displayName: Build & Push Docker image to AWS ECR
-  jobs:
-  - job: Build_and_Push
-    displayName: Build & Push Docker image
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        buildContext: '$(Build.SourcesDirectory)'
-        repository: $(DOCKER_REPOSITORY_NAME)
+steps:
+- task: Docker@2
+  displayName: Login to AWS ECR
+  inputs:
+    containerRegistry: 'aws-ecr-connection'
+    command: 'login'
 
-    - task: ECRPushImage@1
-      inputs:
-        awsCredentials: 'AWS_ECR'
-        regionName: $(AWS_REGION)
-        imageSource: 'imagename'
-        sourceImageName: $(DOCKER_REPOSITORY_NAME)
-        sourceImageTag: $(Build.BuildId)
-        pushTag: latest
-        repositoryName: $(DOCKER_REPOSITORY_NAME)
+- task: Docker@2
+  displayName: Build and push Docker image
+  inputs:
+    containerRegistry: 'aws-ecr-connection'
+    repository: '$(AWS_ECR_REGISTRY)/$(AWS_ECR_REPOSITORY)'
+    command: 'buildAndPush'
+    Dockerfile: '$(DOCKERFILE_PATH)'
+    tags: '$(IMAGE_TAG)'
