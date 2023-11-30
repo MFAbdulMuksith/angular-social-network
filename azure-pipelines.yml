@@ -1,4 +1,5 @@
 # Starter pipeline
+# https://www.devguides.dev/how-to-build-and-deploy-docker-images-from-azure-devops-to-aws-ecr/
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
@@ -7,58 +8,29 @@
 trigger:
   - master
 
+trigger:
+  branches:
+    include:
+    - master
 pool:
   name: Mumbai.EC2.t2
 
-stages:
-  - stage: Build
-    displayName: 'Build stage'
-    jobs:
-      - job: BuildJob
-        displayName: 'Build Job'
-        pool:
-          name: Mumbai.EC2.t2
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: |
-                pwd
-                ls -al
-                sudo docker build -t angular-img .
-                sudo docker stop angular-cont
-                echo "No container to stop"
-                sudo docker images
-          - task: ECRPushImage@1
-            displayName: 'ECR push'
-            inputs:
-              awsCredentials: 'my-AWS-connection'
-              regionName: 'ap-south-1'
-              imageSource: 'imageid'
-              sourceImageId: '$(ECR_URI)'
-              repositoryName: '$(ECR-repo-name)'
-              forceDockerNamingConventions: true
-
-  - stage: Deploy
-    displayName: 'Deploy stage'
-    jobs:
-      - job: DeployJob
-        displayName: 'Deploy Job'
-        pool:
-          name: Mumbai.EC2.t2
-        steps:
-          - task: ECRPullImage@1
-            inputs:
-              awsCredentials: 'my-AWS-connection'
-              regionName: 'ap-south-1'
-              repository: 'my-angular-app'
-              imageSource: 'imagetag'
-          - task: CmdLine@2
-            inputs:
-              script: |
-                pwd
-                ls -al
-                sudo docker rm angular-cont
-                echo "No container to remove"
-                sudo docker run -d -p 80:80 --name angular-cont angular-img
-                sudo docker ps
-                echo "Visit http://52.66.240.150/"
+variables:
+  - group: dev
+  - name: DOCKER_REPOSITORY
+    value: $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(DOCKER_REPOSITORY_NAME)
+steps:
+- script: |
+    aws ecr get-login-password --region $(AWS_REGION) | docker login --username AWS --password-stdin $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
+  displayName: 'Login to AWS'
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+- task: Docker@2
+  displayName: Build docker image
+  inputs:
+    repository: $(DOCKER_REPOSITORY)
+    command: buildAndPush
+    Dockerfile: Dockerfile
+    tags: |
+      latest
