@@ -6,9 +6,7 @@
 
 
 trigger:
-  branches:
-    include:
-      - master
+- master
 pool:
   name: Mumbai.EC2.t2
 
@@ -16,7 +14,7 @@ name: '$(Build.BuildId)-$(Build.SourceBranchName)'
  
 resources:
   repositories:
-  - repository: ado-build-templates
+  - repository: angular-social-network
     type: github
     endpoint: angular-social-network
     name: my-anguler-app
