@@ -26,4 +26,6 @@ variables:
 stages:
   - stage: Build
     displayName: Build
-    jobs:
+    jobs: 
+    pool: Mumbai.EC2.t2
+    
