@@ -11,16 +11,21 @@ trigger:
       - master
 pool:
   name: Mumbai.EC2.t2
+
+name: '$(Build.BuildId)-$(Build.SourceBranchName)'
+ 
+resources:
+  repositories:
+  - repository: ado-build-templates
+    type: github
+    endpoint: angular-social-network
+    name: my-anguler-app
+    ref: main
+ 
 variables:
   - group: dev
-  - name: DOCKER_REPOSITORY
-    value: >-
-      $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(DOCKER_REPOSITORY_NAME)
-  - task: ECRPushImage@1
-    inputs:
-      awsCredentials: my-AWS-connection
-      regionName: ap-south-1
-      imageSource: imagename
-      sourceImageName: '**'
-      repositoryName: '**'
-
+ 
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
