@@ -17,10 +17,10 @@ variables:
   - name: DOCKER_REPOSITORY
     value: $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(DOCKER_REPOSITORY_NAME)
 
-- task: ECRPushImage@1
-  inputs:
-    awsCredentials: 'my-AWS-connection'
-    regionName: 'ap-south-1'
-    imageSource: 'imagename'
-    sourceImageName: '**'
-    repositoryName: '**'
+  - task: ECRPushImage@1
+    inputs:
+      awsCredentials: 'my-AWS-connection'
+      regionName: 'ap-south-1'
+      imageSource: 'imagename'
+      sourceImageName: '**'
+      repositoryName: '**'
