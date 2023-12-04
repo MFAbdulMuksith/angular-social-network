@@ -1,35 +1,22 @@
-# build/build-docker-and-push-to-ecr.yaml
-parameters:
-- name: dockerfile
-  type: string
-  default: Dockerfile
-- name: imageRepository
-  type: string
-  default: my-angular-app
-- name: containerRegistry
-  type: string
-  default: myecr
-- name: repository
-  type: string
-  default: my-angular-app
-- name: tag
-  type: string
-  default: $(Build.BuildId)
+trigger:
+  - master
 
-steps:
-- task: Docker@2
-  displayName: Login to ACR
-  inputs:
-    command: login
-    containerRegistry: myecr
+pool:
+  vmImage: ubuntu-20.04
 
-- task: Docker@2
-  displayName: Build and push image
-  inputs:
-    command: buildAndPush
-    repository: ${{ parameters.repository }}
-    dockerfile: ${{ parameters.dockerfile }}
-    containerRegistry: ${{ parameters.containerRegistry }}
-    tags: |
-      ${{ parameters.tag }}
-
+stages:
+  - stage: Build
+    displayName: 'Build stage'
+    jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          image: ubuntu
+        steps:
+          - task: CmdLine@2
+            inputs:
+              script: |
+                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 442455973096.dkr.ecr.ap-south-1.amazonaws.com
+                docker build -t my-anguler-app .
+                docker tag my-anguler-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
+                docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latestcd
