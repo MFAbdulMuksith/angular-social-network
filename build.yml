@@ -1,0 +1,22 @@
+trigger:
+  - master
+
+pool:
+  name: Azure Pipelines
+
+stages:
+  - stage: Build
+    displayName: 'Build stage'
+    jobs:
+      - job: BuildJob
+        displayName: 'Build Job'
+        pool:
+          name: Azure Pipelines
+        steps:
+          - task: CmdLine@2
+            inputs:
+              script: |
+                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 442455973096.dkr.ecr.ap-south-1.amazonaws.com
+                docker build -t my-anguler-app .
+                docker tag my-anguler-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
+                docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
