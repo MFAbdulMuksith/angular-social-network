@@ -1,21 +1,28 @@
-# Stage 1 build
+# Install Node.js and npm
+FROM node:14 AS build
 
-FROM node:latest as build
+# Set the working directory
+WORKDIR /app
 
-WORKDIR /usr/src/app
+# Install Angular CLI
+RUN npm install -g @angular/cli@14.0.2
 
-COPY . .
+# Copy the application code
+COPY . /app
 
-RUN npm install -g @angular/cli
-
+# Install dependencies
 RUN npm install
 
-RUN npm run build
+# Build the Angular app
+RUN ng build 
 
-# Stage 2 Serve app with nginx server
+# Use Nginx to serve the app
+FROM nginx:alpine
 
-FROM nginx:latest
-
-COPY --from=build /usr/src/app/dist/angular-social-network /usr/share/nginx/html
+# Copy the Angular build from the node image to the Nginx web server directory
+COPY --from=build /app/dist/angular-social-network /usr/share/nginx/html
 
 EXPOSE 80
+
+# Command to run the Nginx server
+CMD ["nginx", "-g", "daemon off;"]
