@@ -1,31 +1,29 @@
 trigger:
-- master
-pool: Azure Pipelines
+  - master
+
+pool:
+  name: Azure Pipelines
 
 stages:
-  - template: /build.yml
-
-  - stage: Docker
-    displayName: Build & Push Docker image to AWS ECR
+  - stage: Build
+    displayName: 'Build stage'
     jobs:
-      - job: Build_and_Push
-        displayName: Build & Push Docker image
+      - job: BuildJob
+        displayName: 'Build Job'
         pool:
-          vmImage: ubuntu-latest
+          name: Azure Pipelines
         steps:
-          - task: Docker@2
-            displayName: Build an image
+          - task: CmdLine@2
             inputs:
-              command: build
-              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-              buildContext: '$(Build.SourcesDirectory)'
-              repository: $(DOCKER_REPOSITORY_NAME)
-
-          - task: ECRPushImage@1
-            inputs:
-              awsCredentials: 'aws-ecr-connection'
-              regionName: '$(AWS_REGION)'
-              imageSource: 'imagename'
-              sourceImageName: '$(DOCKER_REPOSITORY_NAME)'
-              sourceImageTag: '$(Build.BuildId)'
-              repositoryName: '$(DOCKER_REPOSITORY_NAME)'
+              script: |
+                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 442455973096.dkr.ecr.ap-south-1.amazonaws.com
+                docker build -t my-anguler-app .
+                docker tag my-anguler-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
+                docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
+       
+  - task: ECRPullImage@1
+    inputs:
+      awsCredentials: 'aws-ecr-connection'
+      regionName: 'ap-south-1'
+      repository: 'my-anguler-app'
+      imageSource: 'imagetag'
