@@ -1,8 +1,9 @@
 trigger:
 - master
+pool: Azure Pipelines
 
 stages:
-  - template: build.yml
+  - template: /build.yml
 
   - stage: Docker
     displayName: Build & Push Docker image to AWS ECR
