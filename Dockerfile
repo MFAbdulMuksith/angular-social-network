@@ -10,6 +10,9 @@ RUN npm install -g @angular/cli@14.0.2
 # Copy the application code
 COPY . /app
 
+# update the npm 
+RUN npm update
+
 # Install dependencies
 RUN npm install
 
