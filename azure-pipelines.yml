@@ -2,7 +2,7 @@ trigger:
   - master
 
 pool:
-  name: Azure Pipelines
+  name: AWS_ubuntu_server
 
 stages:
   - stage: Build
@@ -11,7 +11,7 @@ stages:
       - job: BuildJob
         displayName: 'Build Job'
         pool:
-          name: Azure Pipelines
+          name: AWS_ubuntu_server
         steps:
           - task: CmdLine@2
             inputs:
