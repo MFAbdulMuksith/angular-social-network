@@ -6,7 +6,11 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'  
+  name: 'Azure Pipelines'
+
+variables:
+  awsRegion: 'ap-south-1'
+  ecrRepository: 'my-angular-app'
 
 jobs:
 - job: BuildAndPush
@@ -16,8 +20,7 @@ jobs:
     displayName: 'Push Docker Image to Amazon ECR'
     inputs:
       awsCredentials: 'aws-ecr-connection'
-      regionName: 'ap-south-1'
-      imageSource: 'containerRegistry'  
-      sourceImageName: 'my-angular-app'  
-      repositoryName: 'my-angular-app'
+      regionName: '$(awsRegion)'
+      imageSource: 'containerRegistry'
+      repositoryName: '$(ecrRepository)'
       forceDockerNamingConventions: true
