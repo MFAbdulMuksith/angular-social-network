@@ -1,27 +1,23 @@
 # This pipeline builds and pushes a Docker image to AWS ECR
 # create a service connection to AWS ECR and name it 'aws-ecr-connection'
 # set the following environment variables:
-# - AWS_ECR_REGISTRY: the name of  AWS ECR registry
-# - AWS_ECR_REPOSITORY: the name of  AWS ECR repository
-# - DOCKERFILE_PATH: the path to  Dockerfile
-# - IMAGE_TAG: the tag for  Docker image
 
 trigger:
 - master
 
 pool:
-  name: Mumbai.EC2.t2
+  vmImage: 'ubuntu-latest'  
 
-steps:
-- task: UseNode@1
-  inputs:
-    version: '14.x'
-    checkLatest: true
-    force32bit: true
-
-- script: |
-    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 442455973096.dkr.ecr.ap-south-1.amazonaws.com
-    docker build -t my-angular-app .
-    docker tag my-angular-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app:latest
-    docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app:latest
-  displayName: 'Build and Push Docker Image'
+jobs:
+- job: BuildAndPush
+  displayName: 'Build and Push to ECR'
+  steps:
+  - task: ECRPushImage@1
+    displayName: 'Push Docker Image to Amazon ECR'
+    inputs:
+      awsCredentials: 'aws-ecr-connection'
+      regionName: 'ap-south-1'
+      imageSource: 'containerRegistry'  # Adjust based on your container registry configuration
+      sourceImageName: 'my-angular-app'  # Corrected typo: 'anguler' to 'angular'
+      repositoryName: 'my-angular-app'
+      forceDockerNamingConventions: true
