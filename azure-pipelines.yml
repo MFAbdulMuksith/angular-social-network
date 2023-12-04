@@ -1,5 +1,5 @@
 trigger:
- - master
+- master
 
 variables:
   DOCKER_REPOSITORY_NAME: 'my-anguler-app'
