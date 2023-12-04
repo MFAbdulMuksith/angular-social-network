@@ -1,19 +1,13 @@
-# This pipeline builds and pushes a Docker image to AWS ECR
-# create a service connection to AWS ECR and name it 'aws-ecr-connection'
-# set the following environment variables:
-
 trigger:
   branches:
     include:
       - master
 pr: none
+variables:
+  DOCKER_REPOSITORY_NAME: 'my-anguler-app'
+  AWS_REGION: 'ap-south-1'
 stages:
-
-  - stage: AdditionalStage
-    jobs:
-    - job: CustomJob
-      steps:
-      - script: echo "Custom job steps"
+  - template: templates/build.yml
 
   - stage: Docker
     displayName: Build & Push Docker image to AWS ECR
@@ -33,10 +27,9 @@ stages:
 
           - task: ECRPushImage@1
             inputs:
-              awsCredentials: 'AWS_ECR'
-              regionName: $(AWS_REGION)
+              awsCredentials: 'aws-ecr-connection'
+              regionName: '$(AWS_REGION)'
               imageSource: 'imagename'
-              sourceImageName: $(DOCKER_REPOSITORY_NAME)
-              sourceImageTag: $(Build.BuildId)
-              pushTag: latest
-              repositoryName: $(DOCKER_REPOSITORY_NAME)
+              sourceImageName: '$(DOCKER_REPOSITORY_NAME)'
+              sourceImageTag: '$(Build.BuildId)'
+              repositoryName: '$(DOCKER_REPOSITORY_NAME)'
