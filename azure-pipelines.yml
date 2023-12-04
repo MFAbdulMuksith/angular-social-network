@@ -1,13 +1,12 @@
 trigger:
-  branches:
-    include:
-      - master
-pr: none
+ - master
+
 variables:
   DOCKER_REPOSITORY_NAME: 'my-anguler-app'
   AWS_REGION: 'ap-south-1'
+
 stages:
-  - template: templates/build.yml
+  - template: build.yml
 
   - stage: Docker
     displayName: Build & Push Docker image to AWS ECR
