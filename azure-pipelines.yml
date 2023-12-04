@@ -3,24 +3,40 @@
 # set the following environment variables:
 
 trigger:
-- master
+  branches:
+    include:
+      - master
+pr: none
+stages:
 
-pool:
-  name: 'Azure Pipelines'
+  - stage: AdditionalStage
+    jobs:
+    - job: CustomJob
+      steps:
+      - script: echo "Custom job steps"
 
-variables:
-  awsRegion: 'ap-south-1'
-  ecrRepository: 'my-angular-app'
+  - stage: Docker
+    displayName: Build & Push Docker image to AWS ECR
+    jobs:
+      - job: Build_and_Push
+        displayName: Build & Push Docker image
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Docker@2
+            displayName: Build an image
+            inputs:
+              command: build
+              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+              buildContext: '$(Build.SourcesDirectory)'
+              repository: $(DOCKER_REPOSITORY_NAME)
 
-jobs:
-- job: BuildAndPush
-  displayName: 'Build and Push to ECR'
-  steps:
-  - task: ECRPushImage@1
-    displayName: 'Push Docker Image to Amazon ECR'
-    inputs:
-      awsCredentials: 'aws-ecr-connection'
-      regionName: '$(awsRegion)'
-      imageSource: 'containerRegistry'
-      repositoryName: '$(ecrRepository)'
-      forceDockerNamingConventions: true
+          - task: ECRPushImage@1
+            inputs:
+              awsCredentials: 'AWS_ECR'
+              regionName: $(AWS_REGION)
+              imageSource: 'imagename'
+              sourceImageName: $(DOCKER_REPOSITORY_NAME)
+              sourceImageTag: $(Build.BuildId)
+              pushTag: latest
+              repositoryName: $(DOCKER_REPOSITORY_NAME)
