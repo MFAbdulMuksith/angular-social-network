@@ -1,10 +1,6 @@
 trigger:
 - master
 
-variables:
-  DOCKER_REPOSITORY_NAME: 'my-anguler-app'
-  AWS_REGION: 'ap-south-1'
-
 stages:
   - template: build.yml
 
