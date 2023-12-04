@@ -17,7 +17,7 @@ jobs:
     inputs:
       awsCredentials: 'aws-ecr-connection'
       regionName: 'ap-south-1'
-      imageSource: 'containerRegistry'  # Adjust based on your container registry configuration
-      sourceImageName: 'my-angular-app'  # Corrected typo: 'anguler' to 'angular'
+      imageSource: 'containerRegistry'  
+      sourceImageName: 'my-angular-app'  
       repositoryName: 'my-angular-app'
       forceDockerNamingConventions: true
