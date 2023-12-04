@@ -20,10 +20,3 @@ stages:
                 docker build -t my-anguler-app .
                 docker tag my-anguler-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
                 docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
-       
-  - task: ECRPullImage@1
-    inputs:
-      awsCredentials: 'aws-ecr-connection'
-      regionName: 'ap-south-1'
-      repository: 'my-anguler-app'
-      imageSource: 'imagetag'
