@@ -1,22 +1,35 @@
+# https://github.com/MFAbdulMuksith/ado-build-template.git branch main
+
 trigger:
-  - master
+- main
 
 pool:
-  name: AWS_ubuntu_server
+  vmImage: ubuntu-20.04
+
+name: '$(Build.BuildId)-$(Build.SourceBranchName)'
+
+resources:
+  repositories:
+  - repository: ado-build-templates
+    type: github
+    endpoint: MFAbdulMuksith
+    name: MFAbdulMuksith/ado-build-template 
+    ref: main
+
+variables:
+- group: my-angular-app
 
 stages:
-  - stage: Build
-    displayName: 'Build stage'
-    jobs:
-      - job: BuildJob
-        displayName: 'Build Job'
-        pool:
-          name: AWS_ubuntu_server
-        steps:
-          - task: CmdLine@2
-            inputs:
-              script: |
-                aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 442455973096.dkr.ecr.ap-south-1.amazonaws.com
-                docker build -t my-anguler-app .
-                docker tag my-anguler-app:latest 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
-                docker push 442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-anguler-app:latest
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: BuildDocker
+    displayName: Build Docker Image and Push to ECR
+    steps:
+    - template: build/build-docker-and-push-to-ecr.yaml@ado-build-templates # change the path to include the build folder
+      parameters:
+        dockerfile: Dockerfile
+        imageRepository: my-angular-app
+        containerRegistry: myecr
+        repository: my-angular-app
+        tag: $(Build.BuildId)
