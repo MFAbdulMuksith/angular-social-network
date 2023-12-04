@@ -18,10 +18,10 @@ parameters:
 
 steps:
 - task: Docker@2
-  displayName: Login to ECR
+  displayName: Login to ACR
   inputs:
     command: login
-    containerRegistry: ${{ parameters.containerRegistry }}
+    containerRegistry: myecr
 
 - task: Docker@2
   displayName: Build and push image
@@ -32,3 +32,4 @@ steps:
     containerRegistry: ${{ parameters.containerRegistry }}
     tags: |
       ${{ parameters.tag }}
+
