@@ -1,7 +1,25 @@
-trigger:  
-  branches:    
-    include:      
-      - master
-pr: none
-stages:
-- template: templates/build.yml
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: BuildAndPushDockerImage
+  displayName: 'Build and Push Docker Image'
+  steps:
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'Docker Registry service connection'
+      repository: 'my-angular-app'
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+    displayName: 'Build Docker Image'
+
+  - task: ECRPushImage@1
+    inputs:
+      awsCredentials: 'aws-ecr-connection'
+      regionName: 'ap-south-1'
+      imageSource: 'imageid'
+      repositoryName: 'my-angular-app'
+      autoCreateRepository: true
