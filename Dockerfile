@@ -1,5 +1,5 @@
 # Stage 1: Build Angular app
-FROM node:14 AS build
+FROM node:latest AS build
 
 # Set the working directory
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN npm install
 RUN ng build
 
 # Stage 2: Use Nginx to serve the app
-FROM nginx:alpine
+FROM nginx:latest
 
 # Copy the Angular build from the build stage to the Nginx web server directory
 COPY --from=build /app/dist/angular-social-network /usr/share/nginx/html
