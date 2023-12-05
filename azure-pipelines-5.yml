@@ -1,26 +1,28 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
-
+- main
+- containerize
+ 
+pr:
+  - none
+ 
 pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-- task: ECRPushImage@1
-  inputs:
-    awsCredentials: 'aws-ecr-connection'
-    regionName: 'ap-south-1'
-    imageSource: 'imagename'
-    sourceImageName: 'social-app'
-    repositoryName: '442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app'
+  vmImage: ubuntu-20.04
+ 
+name: '$(Build.BuildId)-$(Build.SourceBranchName)'
+ 
+resources:
+  repositories:
+  - repository: ado-build-templates
+    type: github
+    endpoint: MFAbdulMuksith
+    name: MFAbdulMuksith/ado-build-templates
+    ref: master
+ 
+variables:
+  - group: dev
+ 
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - template: build/build-docker-and-push-to-ecr.yaml@ado-build-templates
