@@ -11,16 +11,7 @@ jobs:
   - task: Docker@2
     inputs:
       containerRegistry: 'Docker Registry service connection'
-      repository: '442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app'
+      repository: 'abdmuksith/test'
       command: 'buildAndPush'
       Dockerfile: 'Dockerfile'
     displayName: 'Build Docker Image'
-
-  - task: ECRPushImage@1
-    inputs:
-      awsCredentials: 'aws-ecr-connection'
-      regionName: 'ap-south-1'
-      imageSource: 'imageid'
-      sourceImageId: '442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app'
-      repositoryName: '442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app'
-      autoCreateRepository: true
