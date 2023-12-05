@@ -17,3 +17,10 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+- task: ECRPushImage@1
+  inputs:
+    awsCredentials: 'aws-ecr-connection'
+    regionName: 'ap-south-1'
+    imageSource: 'imagename'
+    sourceImageName: 'social-app'
+    repositoryName: '442455973096.dkr.ecr.ap-south-1.amazonaws.com/my-angular-app'
